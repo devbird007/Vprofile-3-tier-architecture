@@ -11,12 +11,12 @@ This is a 3-tier web application set up locally with Vagrant, Virtualbox and Bas
 - MySQL 5.6 or later
 
 ## Services
-Nginx --> Web Service
-Tomcat --> Application Server
-RabbitMQ --> Broker/Queuing Agent
-Memcache --> DB Caching
-ElasticSearch --> Indexing/Search Service
-MySQL --> SQL Database
+- Nginx --> Web Service
+- Tomcat --> Application Server
+- RabbitMQ --> Broker/Queuing Agent
+- Memcache --> DB Caching
+- ElasticSearch --> Indexing/Search Service
+- MySQL --> SQL Database
 
 ## Procedure
 In the `vagrant/My_Provisioning` folder, there is a **Vagrantfile** that automates the creation
