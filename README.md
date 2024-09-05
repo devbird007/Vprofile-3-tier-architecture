@@ -1,5 +1,5 @@
-# 3-Tier Application Setup Locally
-This is a 3-tier web application set up locally with Vagrant, Virtualbox and Bash Scripting
+# 3-Tier Application Setup on Ubuntu Servers or locally with Vagrant
+This is a distributed web application.
 
 ## Architecture
 ![architecture](images/architecture.png)
