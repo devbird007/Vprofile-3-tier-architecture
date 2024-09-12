@@ -19,8 +19,10 @@ This is a distributed web application.
 - MySQL --> SQL Database
 
 ## Procedure
-In the `vagrant/My_Provisioning` folder, there is a **Vagrantfile** that automates the creation
-and setup of 6 virtual machines in virtualbox. Execute the following command to create them:
+In the `vagrant/My_Provisioning` folder, the **Vagrantfile** automates the creation,
+and setup of 6 virtual machines in virtualbox. This could serve as a template for
+creating a **Vagrant Multi-Machine** setup.
+Execute the following command to create them:
 ```
 cd vagrant/MY_Provisioning
 vagrant up
