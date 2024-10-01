@@ -23,7 +23,7 @@ sudo chown -R tomcat:tomcat /usr/local/tomcat9
 ## Setting up a systemd unit file
 sudo rm -rf /etc/systemd/system/tomcat.service
 
-cat <<EOF>> /etc/systemd/system/tomcat.service
+cat <<EOF > /etc/systemd/system/tomcat.service
 [Unit]
 Description=Tomcat
 After=network.target
@@ -45,3 +45,24 @@ sudo systemctl daemon-reload
 sudo systemctl start tomcat
 sudo systemctl enable tomcat
 
+# Codebuild & Deploy
+git clone -b main https://github.com/devbird007/Vprofile-3-tier-architecture.git
+
+cd Vprofile-3-tier-architecture
+
+mvn install
+
+sudo systemctl stop tomcat
+sleep 20
+rm -rf /usr/local/tomcat9/webapps/ROOT*
+
+cp target/vprofile-v2.war /usr/local/tomcat9/webapps/ROOT.war
+sudo systemctl start tomcat
+
+sleep 20
+
+## Configure firewall
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --reload
