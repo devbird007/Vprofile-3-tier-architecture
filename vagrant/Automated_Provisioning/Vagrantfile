@@ -9,7 +9,8 @@ Vagrant.configure("2") do |config|
     db01.vm.network "private_network", ip: "192.168.56.15"
     db01.vm.provider "virtualbox" do |vb|
       vb.memory = "600"
-    end
+    end 
+    db01.vm.provision "shell", path: "centos-yum-repo-conf.sh"
     db01.vm.provision "shell", path: "mysql.sh"
   end
   
@@ -21,6 +22,7 @@ Vagrant.configure("2") do |config|
     mc01.vm.provider "virtualbox" do |vb|
       vb.memory = "600"
     end
+    mc01.vm.provision "shell", path: "centos-yum-repo-conf.sh"
     mc01.vm.provision "shell", path: "memcache.sh",
       keep_color: true
   end
@@ -33,6 +35,7 @@ Vagrant.configure("2") do |config|
     rmq01.vm.provider "virtualbox" do |vb|
       vb.memory = "600"
     end
+    rmq01.vm.provision "shell", path: "centos-yum-repo-conf.sh"
     rmq01.vm.provision "shell", path: "rabbitmq.sh"
   end
 
@@ -44,6 +47,7 @@ Vagrant.configure("2") do |config|
     app01.vm.provider "virtualbox" do |vb|
       vb.memory = "800"
     end
+    app01.vm.provision "shell", path: "centos-yum-repo-conf.sh"
     app01.vm.provision "shell", path: "tomcat.sh"
   end
 
