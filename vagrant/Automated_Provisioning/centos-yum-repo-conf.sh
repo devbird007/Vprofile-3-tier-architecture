@@ -12,9 +12,9 @@ NEW_SOURCE="http://vault.centos"
 
 cd /etc/yum.repos.d/
 
-sudo sed -i "s/$OLD_MIRROR/$NEW_MIRROR/" CentOS-Base.repo
-sudo sed -i "s/$OLD_BASEURL/$NEW_BASEURL/" CentOS-Base.repo
-sudo sed -i "s#$OLD_SOURCE#$NEW_SOURCE#" CentOS-Base.repo
+sudo sed -i "s/$OLD_MIRROR/$NEW_MIRROR/g" CentOS-Base.repo
+sudo sed -i "s/$OLD_BASEURL/$NEW_BASEURL/g" CentOS-Base.repo
+sudo sed -i "s#$OLD_SOURCE#$NEW_SOURCE#g" CentOS-Base.repo
 
 sudo yum update -y
 

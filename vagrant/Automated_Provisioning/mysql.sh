@@ -10,15 +10,15 @@ sudo systemctl enable mariadb
 
 ## Configuring mariadb with secure installations
 ### Set password for root user
-sudo mysql -e "ALTER USER root@localhost IDENTIFIED BY '$DATABASE_PASS';"
+sudo mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$DATABASE_PASS')"
 ### Delete anonymous users
 sudo mysql -u root -p$DATABASE_PASS -e "DELETE FROM mysql.user WHERE User=''"
 ### Disable remote root user login
-sudo mysql -u root -p$DATABASE_PASS -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+sudo mysql -u root -p$DATABASE_PASS -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')"
 ### Delete the test database
 sudo mysql -u root -p$DATABASE_PASS -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
 ### Ensure changes take effect
-sudo mysql -u root -p$DATABASE_PASS -e "FLUSH PRIVILEGES;"
+sudo mysql -u root -p$DATABASE_PASS -e "FLUSH PRIVILEGES"
 
 ## Downloading the source code and initializing the database
 cd /tmp/
