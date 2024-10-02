@@ -7,11 +7,20 @@ sudo yum install java-1.8.0-openjdk.x86_64 -y
 sudo yum install -y git maven wget
 
 ## Create user for Tomcat
-sudo useradd --home-dir /usr/local/tomcat9 --shell /sbin/nologin tomcat
+
+user_exists=$(cat /etc/passwd | grep "tomcat")
+
+if [[ -z $user_exists ]]; then
+    ## User doesn't exist, create it
+    sudo useradd --home-dir /usr/local/tomcat9 --shell /sbin/nologin tomcat
+else
+    ## User already exists, skip creation."
+    echo "User already exists, skipping creation"
+fi
 
 ## Install Tomcat
 cd /tmp/
-wget $TOMURL -O tomcatbin.tar.gz
+wget $TOMURL
 
 sudo tar xvzf apache-tomcat-9.0.75.tar.gz -C /usr/local/tomcat9 --strip-components=1
 
