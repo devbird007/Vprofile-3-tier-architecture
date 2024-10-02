@@ -1,30 +1,17 @@
 #!/bin/bash
-set -euxo pipefail
+set -uxo pipefail
 
 cd /tmp/
 
-## Check if erl(esl-erlang) exists, otherwise download it
-if [ -f "/usr/bin/erl" ]; then
-    echo "Erlang already exists. Skipping download."
-else
-    wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_24.0.2-1~centos~7_amd64.rpm
-
-    sudo yum -y install esl-erlang_24.0.2-1~centos~7_amd64.rpm
-fi
-
-## Install rabbitmq
-if [ -f "/usr/sbin/rabbitmq-server" ]; then
-    echo "Rabbitmq already exists. Skipping download."
-else
-    wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.19/rabbitmq-server-3.8.19-1.el7.noarch.rpm
-
-    sudo yum install -y rabbitmq-server-3.8.19-1.el7.noarch.rpm
-fi
-
+## Configure the yum repositories
+cp /vagrant/rabbitmq.repo /etc/yum.repos.d/.
+dnf update -y
 
 
 ## Install dependencies
-sudo yum install -y socat logrotate
+sudo dnf install -y socat logrotate
+
+sudo dnf install -y erlang rabbitmq-server
 
 ## Start and enable the service
 sudo systemctl start rabbitmq-server
@@ -34,6 +21,7 @@ sudo systemctl enable rabbitmq-server
 echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config
 
 ## Creating user with user privileges
+
 user_exists=$(sudo rabbitmqctl list_users | grep "test")
 
 if [[ -z "$user_exists" ]]; then

@@ -3,7 +3,7 @@ set -euxo pipefail
 
 ## Install memcached and its dependencies
 sudo yum install memcached -y
-sudo yum install libmemcached -y
+sudo dnf --enablerepo=crb install libmemcached-awesome -y
 
 sudo systemctl start memcached
 sudo systemctl enable memcached
