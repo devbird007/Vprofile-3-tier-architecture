@@ -19,7 +19,7 @@ database and along with other functionality.
 - MySQL --> SQL Database
 
 ## Procedure
-The web application is available on `http://web01`
+Upon deployment, the web application is available on `http://web01`.
 ### Automated Setup
 The `vagrant/Automated_Provisioning` directory contains a Vagrantfile
 along with installation shell scripts to automate the start up and
