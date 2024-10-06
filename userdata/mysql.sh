@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euxo pipefail
 
+# Update the server
+sudo yum update -y
+sudo yum install epel-release -y
+
 DATABASE_PASS='admin123'
 
 ## Installing mariadb
@@ -22,7 +26,7 @@ sudo mysql -u root -p$DATABASE_PASS -e "FLUSH PRIVILEGES"
 
 ## Downloading the source code and initializing the database
 cd /tmp/
-git clone -b main https://github.com/devbird007/Vprofile-3-tier-architecture.git
+git clone -b aws-lift-and-shift https://github.com/devbird007/Vprofile-3-tier-architecture.git
 
 sudo mysql -u root -p"$DATABASE_PASS" -e "create database accounts"
 # POSSIBLE POINT OF ERROR
@@ -38,5 +42,4 @@ sudo systemctl start firewalld
 sudo systemctl enable firewalld
 sudo firewall-cmd --get-active-zones
 sudo firewall-cmd --zone=public --add-port=3306/tcp --permanent
-sudo systemctl restart mariadb
 sudo systemctl restart firewalld
