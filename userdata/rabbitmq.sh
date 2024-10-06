@@ -8,11 +8,11 @@ sudo yum install epel-release -y
 
 ## Import necessary signing keys
 ### primary RabbitMQ signing key
-rpm --import 'https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc'
+sudo rpm --import 'https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc'
 ### modern Erlang repository
-rpm --import 'https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key'
+sudo rpm --import 'https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key'
 ### RabbitMQ server repository
-rpm --import 'https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key'
+sudo rpm --import 'https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key'
 
 
 ## Configure the yum repositories
@@ -21,21 +21,75 @@ cat <<EOF > /etc/yum.repos.d/rabbitmq.repo
 # In /etc/yum.repos.d/rabbitmq.repo
 
 ##
-## RabbitMQ Server
+## Zero dependency Erlang RPM
 ##
 
+[modern-erlang]
+name=modern-erlang-el9
+# Use a set of mirrors maintained by the RabbitMQ core team.
+# The mirrors have significantly higher bandwidth quotas.
+baseurl=https://yum1.rabbitmq.com/erlang/el/9/$basearch
+        https://yum2.rabbitmq.com/erlang/el/9/$basearch
+repo_gpgcheck=1
+enabled=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key
+gpgcheck=1
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+pkg_gpgcheck=1
+autorefresh=1
+type=rpm-md
+
+[modern-erlang-noarch]
+name=modern-erlang-el9-noarch
+# Use a set of mirrors maintained by the RabbitMQ core team.
+# The mirrors have significantly higher bandwidth quotas.
+baseurl=https://yum1.rabbitmq.com/erlang/el/9/noarch
+        https://yum2.rabbitmq.com/erlang/el/9/noarch
+repo_gpgcheck=1
+enabled=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key
+       https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
+gpgcheck=1
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+pkg_gpgcheck=1
+autorefresh=1
+type=rpm-md
+
+[modern-erlang-source]
+name=modern-erlang-el9-source
+# Use a set of mirrors maintained by the RabbitMQ core team.
+# The mirrors have significantly higher bandwidth quotas.
+baseurl=https://yum1.rabbitmq.com/erlang/el/9/SRPMS
+        https://yum2.rabbitmq.com/erlang/el/9/SRPMS
+repo_gpgcheck=1
+enabled=1
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key
+       https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
+gpgcheck=1
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+pkg_gpgcheck=1
+autorefresh=1
+
+
 ##
-## CentOS Stream 9
+## RabbitMQ Server
 ##
 
 [rabbitmq-el9]
 name=rabbitmq-el9
-baseurl=https://yum1.rabbitmq.com/rabbitmq/el/9/$basearch
+baseurl=https://yum2.rabbitmq.com/rabbitmq/el/9/$basearch
+        https://yum1.rabbitmq.com/rabbitmq/el/9/$basearch
 repo_gpgcheck=1
 enabled=1
 # Cloudsmith's repository key and RabbitMQ package signing key
-gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
-       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key
+       https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
 gpgcheck=1
 sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
@@ -46,12 +100,13 @@ type=rpm-md
 
 [rabbitmq-el9-noarch]
 name=rabbitmq-el9-noarch
-baseurl=https://yum1.rabbitmq.com/rabbitmq/el/9/noarch
+baseurl=https://yum2.rabbitmq.com/rabbitmq/el/9/noarch
+        https://yum1.rabbitmq.com/rabbitmq/el/9/noarch
 repo_gpgcheck=1
 enabled=1
 # Cloudsmith's repository key and RabbitMQ package signing key
-gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
-       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key
+       https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc
 gpgcheck=1
 sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
@@ -62,10 +117,11 @@ type=rpm-md
 
 [rabbitmq-el9-source]
 name=rabbitmq-el9-source
-baseurl=https://yum1.rabbitmq.com/rabbitmq/el/9/SRPMS
+baseurl=https://yum2.rabbitmq.com/rabbitmq/el/9/SRPMS
+        https://yum1.rabbitmq.com/rabbitmq/el/9/SRPMS
 repo_gpgcheck=1
 enabled=1
-gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
+gpgkey=https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key
 gpgcheck=0
 sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
@@ -73,64 +129,13 @@ metadata_expire=300
 pkg_gpgcheck=1
 autorefresh=1
 type=rpm-md
-
-
-##
-## CentOS Stream 8
-##
-
-[rabbitmq-el8]
-name=rabbitmq-el8
-baseurl=https://yum1.rabbitmq.com/rabbitmq/el/8/$basearch
-repo_gpgcheck=1
-enabled=1
-# Cloudsmith's repository key and RabbitMQ package signing key
-gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
-       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
-gpgcheck=1
-sslverify=1
-sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-metadata_expire=300
-pkg_gpgcheck=1
-autorefresh=1
-type=rpm-md
-
-[rabbitmq-el8-noarch]
-name=rabbitmq-el8-noarch
-baseurl=https://yum1.rabbitmq.com/rabbitmq/el/8/noarch
-repo_gpgcheck=1
-enabled=1
-# Cloudsmith's repository key and RabbitMQ package signing key
-gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
-       https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
-gpgcheck=1
-sslverify=1
-sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-metadata_expire=300
-pkg_gpgcheck=1
-autorefresh=1
-type=rpm-md
-
-[rabbitmq-el8-source]
-name=rabbitmq-el8-source
-baseurl=https://yum1.rabbitmq.com/rabbitmq/el/8/SRPMS
-repo_gpgcheck=1
-enabled=1
-gpgkey=https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key
-gpgcheck=0
-sslverify=1
-sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-metadata_expire=300
-pkg_gpgcheck=1
-autorefresh=1
-type=rpm-md
-
 EOF
 
+## Update package metadata
 dnf update -y
 
 
-## Install dependencies
+## Install dependencies and our software
 sudo dnf install -y socat logrotate
 
 sudo dnf install -y erlang rabbitmq-server
