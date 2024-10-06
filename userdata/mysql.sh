@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -x
 
 # Update the server
 sudo yum update -y
@@ -37,9 +37,8 @@ sudo mysql -u root -p"$DATABASE_PASS" -e "FLUSH PRIVILEGES"
 ## Restarting mariadb-server
 sudo systemctl restart mariadb
 
-## Starting the Firewall and allowing mariadb to access from port 3306
-sudo systemctl start firewalld
-sudo systemctl enable firewalld
-sudo firewall-cmd --get-active-zones
-sudo firewall-cmd --zone=public --add-port=3306/tcp --permanent
-sudo systemctl restart firewalld
+
+
+# NO FIREWALLS NEEDED since AWS Security Groups already provide instance-level security.
+# For the firewalls configs, run `git checkout euro-linux-centos-automated-setup` for
+# the automated local setup on vagrant with centos9
