@@ -12,7 +12,7 @@ user_exists=$(cat /etc/passwd | grep "tomcat")
 
 if [[ -z $user_exists ]]; then
     ## User doesn't exist, create it
-    sudo useradd --home-dir /usr/local/tomcat9 --shell /sbin/nologin tomcat
+    sudo useradd -m --home-dir /usr/local/tomcat9 --shell /sbin/nologin tomcat
 else
     ## User already exists, skip creation."
     echo "User already exists, skipping creation"

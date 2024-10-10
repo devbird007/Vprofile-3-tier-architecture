@@ -63,6 +63,15 @@ Then look for the file :
 - accountsdb.sql file is a mysql dump file. We have to import this dump to mysql db server
 - > mysql -u <user_name> -p accounts < accountsdb.sql
 
+## Versions
+Tomcat:
+  - 10.1.31 on ubuntu
+  - 9.0.75 on centos9
+Java:
+  - 1.21.0 on ubuntu
+  - 1.8.0 on centos9
+
+
 
 ## Troubleshooting Common Errors
 1. If your apps are deployed successfully, however you are unable to

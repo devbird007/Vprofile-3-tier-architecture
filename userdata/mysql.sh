@@ -41,4 +41,5 @@ sudo systemctl restart mariadb
 
 # NO FIREWALLS NEEDED since AWS Security Groups already provide instance-level security.
 # For the firewalls configs, run `git checkout euro-linux-centos-automated-setup` for
-# the automated local setup on vagrant with centos9
+# the automated local setup on vagrant with centos9 which contains the firewall-configs in their scripts
+# for each service
