@@ -1,9 +1,9 @@
-# 3-Tier Automated Application Setup on Ubuntu Servers with Shell Scripts for Vagrant
+# 3-Tier Weh Application Lift and Shift to AWS Cloud Platform
 This is a distributed web application complete with a web server, 
 database and along with other functionality.
 
 ## Architecture
-![architecture](images/architecture.png)
+![architecture](images/cloud-architecture.png)
 
 ## Prerequisites
 - JDK 1.8 or later
@@ -67,6 +67,7 @@ Then look for the file :
 Tomcat:
   - 10.1.31 on ubuntu
   - 9.0.75 on centos9
+  
 Java:
   - 1.21.0 on ubuntu
   - 1.8.0 on centos9
