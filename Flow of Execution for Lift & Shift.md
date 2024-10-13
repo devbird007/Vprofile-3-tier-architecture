@@ -82,7 +82,7 @@ Import << Create Backend Servers >>, but change the following:
   - For **User data**, copy the contents of `userdata/tomcat*`
 
 
-## 5. Update the Private IP of the 3 Backend instances in Route53 private DNS zones
+## 5. Update the Private IP of the 3 Backend instances in a Route53 private DNS zone
 *Note down the Private IPs of the three instances*
   
 ### Create a Private Hosted Zone
