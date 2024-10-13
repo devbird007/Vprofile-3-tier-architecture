@@ -12,6 +12,7 @@ sudo systemctl enable memcached
 sudo systemctl start firewalld
 sudo systemctl enable firewalld
 
+## This configures external access for memcached
 sed -i 's/127.0.0.1/0.0.0.0/g' /etc/sysconfig/memcached
 sudo systemctl restart memcached
 
