@@ -65,20 +65,12 @@ Then look for the file :
 
 ## Versions
 Tomcat:
-  - 10.1.31 on ubuntu
   - 9.0.75 on centos9
   
 Java:
-  - 1.21.0 on ubuntu
   - 1.8.0 on centos9
 
 
 
 ## Troubleshooting Common Errors
-1. If your apps are deployed successfully, however you are unable to
-log in on the webpage `http://web01` successfully. Run the following commands in the Vagrantfile directory to ssh into the database server and restart the firewall:
-```
-vagrant ssh db01
-sudo systemctl restart firewalld
-```
-
+1. If your apps are deployed successfully, however you are unable to log in on the webpage successfully, you could check out database connection with `telnet IP_Address PORT`
