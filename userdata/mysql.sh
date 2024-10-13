@@ -30,7 +30,8 @@ git clone -b aws-lift-and-shift https://github.com/devbird007/Vprofile-3-tier-ar
 
 sudo mysql -u root -p"$DATABASE_PASS" -e "create database accounts"
 # POSSIBLE POINT OF ERROR
-sudo mysql -u root -p"$DATABASE_PASS" -e "grant all privileges on accounts.* TO 'admin'@'app01' identified by 'admin123'"
+sudo mysql -u root -p"$DATABASE_PASS" -e "grant all privileges on accounts.* TO 'admin'@'%' identified by 'admin123'"
+sudo mysql -u root -p"$DATABASE_PASS" -e "grant all privileges on accounts.* TO 'admin'@'localhost' identified by 'admin123'"
 sudo mysql -u root -p"$DATABASE_PASS" accounts < Vprofile-3-tier-architecture/src/main/resources/db_backup.sql
 sudo mysql -u root -p"$DATABASE_PASS" -e "FLUSH PRIVILEGES"
 

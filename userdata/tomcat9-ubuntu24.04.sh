@@ -1,31 +1,28 @@
 #!/bin/bash
 set -x
-TOMURL=https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.75/bin/apache-tomcat-9.0.75.tar.gz
-sudo apt update -y
+TOMURL=https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.71/bin/apache-tomcat-9.0.71.tar.gz
+sudo apt update
 
-## Install java and its dependencies
-sudo apt install openjdk-8-jdk -y
-java -version
-
+## Install java 11 and other necessary apps
+sudo apt install openjdk-11-jdk -y
 sudo apt install git maven wget -y
 
-
-
-## Create user with home directory for Tomcat
+## Create user with home directory for tomcat
 user_exists=$(cat /etc/passwd | grep "tomcat")
 
 if [[ -z $user_exists ]]; then
-    ## User doesn't exist, create it
-    sudo useradd -m --home-dir /opt/tomcat --shell /sbin/nologin tomcat
+    ## Since user doesn't exist, then create it
+    sudo useradd -m -U -d /opt/tomcat -s /bin/false tomcat
 else
-    ## User already exists, skip creation."
-    echo "User already exists, skipping creation"
+    ## User already exists, skip creation
+    echo "User already exists, skipping creation."
 fi
+
 
 ## Install tomcat
 cd /tmp/
 
-if [ -f "/tmp/apache-tomcat-9.0.75.tar.gz" ]; then
+if [ -f /tmp/apache-tomcat-9.0* ]; then
     echo "Tomcat already exists. Skipping download."
 else
     echo "Downloading tomcat..."
@@ -33,10 +30,9 @@ else
     sudo tar -xzvf apache-tomcat-9*tar.gz -C /opt/tomcat --strip-components=1
 fi
 
-
 ## Change ownership of the files within tomcat9
 sudo chown -R tomcat:tomcat /opt/tomcat
-sudo chmod -R u+x /opt/tomcat/bin
+sudo chmod +x /opt/tomcat/bin/*.sh
 
 ## Make some configs in the tomcat users file
 
@@ -84,13 +80,12 @@ for path in "${paths[@]}"; do
     fi
 done
 
-
 ## Setting up a systemd unit file
 sudo rm -rf /etc/systemd/system/tomcat.service
 
 cat <<EOF > /etc/systemd/system/tomcat.service
 [Unit]
-Description=Tomcat
+Description=Tomcat 9 servlet container
 After=network.target
 
 [Service]
@@ -99,9 +94,8 @@ Type=forking
 User=tomcat
 Group=tomcat
 
-Environment="JAVA_HOME=/usr/lib/jvm/java-1.21.0-openjdk-amd64/"
-
-Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
+Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom -Djava.awt.headless=true"
 Environment="CATALINA_BASE=/opt/tomcat"
 Environment="CATALINA_HOME=/opt/tomcat"
 Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
@@ -109,9 +103,6 @@ Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
 
 ExecStart=/opt/tomcat/bin/startup.sh
 ExecStop=/opt/tomcat/bin/shutdown.sh
-
-RestartSec=10
-Restart=always
 
 [Install]
 WantedBy=multi-user.target
