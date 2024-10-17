@@ -1,21 +1,19 @@
 # Flow Of Execution For Lift & Shift
-1. Login to AWS Account
-2. Create Security Groups for all groups of instances
-3. Create Key Pairs
-4. Launch Instances with userdata[Bash Scripts]
-5. Update IP to name mapping in Route53
-6. Build Application from source code
-7. Upload the built artifact to S3
-8. Download the artifact to Tomcat Ec2 instance
-9. Buy a Domain and Configure SSL Certificate for your Domain
-10. Setup ELB with HTTPS [Certs from AWS Certificate Manager]
-11. Map ELB Endpoint to website name in Godaddy DNS
-12. Verify that the entire setup works
-13. Build Autoscaling Group for the Tomcat Instances to handle load
+1. Create Security Groups for all groups of instances
+2. Create Key Pairs
+3. Launch Instances with userdata[Bash Scripts]
+4. Update IP to name mapping in Route53
+5. Build Application from source code
+6. Upload the built artifact to S3
+7. Download the artifact to Tomcat Ec2 instance
+8. Buy a Domain and Configure SSL Certificate for your Domain
+9.  Setup ELB with HTTPS [Certs from AWS Certificate Manager]
+10. Map ELB Endpoint to website name in Godaddy DNS
+11. Verify that the entire setup works
+12. Build Autoscaling Group for the Tomcat Instances to handle load
 
 -----------------------------------
-
-## 2. Create your Security Groups
+## 1. Create your Security Groups
 Navigate to **AWS Security Groups**
    
 ### Create a sg for your Elastic Load Balancer
@@ -43,7 +41,7 @@ Navigate to **AWS Security Groups**
 the necessary ports for the backend services, you can always check it out.
 
 
-## 3. Create Key Pairs
+## 2. Create Key Pairs
 Navigate to **Key Pairs**
 
 Select **Create key pair**
@@ -55,7 +53,7 @@ Leave the rest as defaults (RSA, .pem)
 Click **Create key pair** at the bottom 
 
 
-## 4. Launch Instances with Userdata
+## 3. Launch Instances with Userdata
 
 ### Create Backend Servers
 *<- For SERVICE in [db01, mc01, rmq01], do:*
@@ -82,7 +80,7 @@ Import << Create Backend Servers >>, but change the following:
   - For **User data**, copy the contents of `userdata/tomcat*`
 
 
-## 5. Update the Private IP of the 3 Backend instances in a Route53 Private DNS zone
+## 4. Update the Private IP of the 3 Backend instances in a Route53 Private DNS zone
 *Note down the Private IPs of the three instances*
   
 ### Create a Private Hosted Zone
@@ -106,7 +104,7 @@ Import << Create Backend Servers >>, but change the following:
    - Click **Create records**
 
 
-## 6. Build Application From Source Code
+## 5. Build Application From Source Code
 Install mvn and the appropriate java version on your local computer.
 
 Run `cd` to the project's directory, since you should've cloned it by now.
@@ -118,7 +116,7 @@ Edit the file at `src/main/resources/application.properties`:
 Go to the top level of the directory and run `mvn install`
 
 
-## 7. Upload the built artifact to S3
+## 6. Upload the built artifact to S3
 Create a user, give them programmatic access, give them only "Full access to S3", download their access and secret keys.
 
 Set up your aws-cli with `aws configure` to attach the keys for the newly created user to your terminal environment.
@@ -140,7 +138,7 @@ aws s3api put-object \
   --body vprofile-v2.war
 ```
 
-## 8. Download the artifact to Tomcat Ec2 instance
+## 7. Download the artifact to Tomcat Ec2 instance
 In order to download the artifact to Tomcat Ec2 instances, create a role
 ### Creating A Role
 Click **Create role** in the IAM section
@@ -197,7 +195,7 @@ connectivity between the tomcat and mariadb instances.
 You have to pay attention to the host names and IP addresses that
 your tomcat is using to connect to the backend services.
 
-## 9. Buy a Domain and Configure SSL Certificate for your Domain
+## 8. Buy a Domain and Configure SSL Certificate for your Domain
 Purchase a domain of your choice from Godaddy
 
 ### Creating a Free SSL 
@@ -232,7 +230,7 @@ Back on the AWS ACM Certificates page, the status of the newly created certifica
 
 >Note: If it isn't showing "Issued" a short while after completing the above step, you should delete the certificate, and repeat the request process to get a new one.
 
-## 10. Setup the Elastic Load Balancer
+## 9. Setup the Elastic Load Balancer
 You need to first create a target group
 ### Create a Target Group
 Navigate to **EC2 Instances>>Load Balancing>>Target Groups** and click **Create target group**
@@ -274,7 +272,7 @@ Under **Listeners and routing**
 
 Scroll to the bottom and click **Create load balancer**
 
-## 11. Map ELB Endpoint to website name in Godaddy DNS
+## 10. Map ELB Endpoint to website name in Godaddy DNS
 
 Copy the **DNS name** for the newly created loadbalancer
 
@@ -285,7 +283,7 @@ Go to GoDaddy and create a new CNAME record with the details:
 Click **Save**
 
 
-## 12. Verify that the entire setup works
+## 11. Verify that the entire setup works
 Open a browser and type in: `https://vprofileapp.<< your domain name >>`
 
 Log in with admin_vp // admin_vp
@@ -295,7 +293,7 @@ Successful login proves that the database is fine
 Click around to test rabbitmq and memcached functionality
 
 
-## 13. Build Autoscaling Group for the Tomcat Instances
+## 12. Build Autoscaling Group for the Tomcat Instances
 
 ### Create an AMI Image of your Tomcat server
 Click your way to **Instances>/<< TOMCAT INSTANCE >>/>Actions>Image and Templates>Create image**
