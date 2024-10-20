@@ -8,7 +8,6 @@ database and along with other functionality.
 ## Prerequisites
 - JDK 1.8 or later
 - Maven 3 or later
-- MySQL 5.6 or later
 
 ## Services
 - Nginx --> Web Service
