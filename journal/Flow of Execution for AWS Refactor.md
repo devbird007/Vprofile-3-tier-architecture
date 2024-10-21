@@ -151,7 +151,7 @@ Under **Tags**, enter `Name:vprofile-rmq01`
 Review all the settings on the final page, then click **Create**
 
 
-4. Launch EC2 and Initialize the RDS DB
+## 4. Launch EC2 and Initialize the RDS DB
 ### DB Initialization
 Copy your `username`, `password` and `endpoint` that will be generated upon successful creation of your database
 
