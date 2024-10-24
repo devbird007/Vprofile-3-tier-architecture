@@ -13,6 +13,23 @@
 
 ---
 
+# Edits to Make Later
+At the end of this project, I am going to redo it and rewrite this page according to the improvements. Specifically these following steps:
+
+1. Create RDS, Amazon ElastiCache(memcached), Amazon MQ(rabbitmq)
+2. Create Elastic Beanstalk Environment
+3. Update SG of backend to allow traffic from Bean SG
+4. Launch one of the EBS-created EC2 instances for DB initializing
+5. Carry out the initializing, and then delete the repo when completed
+6. Edit Elastic Beanstalk LoadBalancer Configs
+7.  Build Artifact with Backend Information
+10. Deploy Artifact to Beanstalk
+11. Create CDN with SSL Cert.
+
+>Note: I will also skip over Step-3, to check if it is redundant. Because note that the backend services sg already allow all traffic internally, and the EBS-created instances are attached to that sg. So technically, there shouldn't be a need to update their rules to accept traffic on ports from the EBS-created sg
+
+---
+
 ## 1. Create Key Pair for Beanstalk Instance Login
 * This is self explanatory *
 
@@ -130,23 +147,23 @@ Under **Broker engine types**, select **RabbitMQ**
 
 Under **Deployment mode**, select **Single-instance broker**
 
-Under **Broker name**, enter a name such as `vprofile-rmq`
+Under **Broker name**, enter a name such as `myprofile-rmq`
 
 Under **Broker instance type**, choose the type `mq.t3.micro`
 
 Under **RabbitMQ access**, enter a random username and password you'll remember
 
-Under **Broker engine version**, select `3.9`
+Under **Broker engine version**, select probably the lowest version
 
-Under **Broker configuration**, leave as **Create a new one with defaults**
+Under **Broker configuration**, leave as **Create a new one with configuration defaults**
 
 Under **Access type**, select **Private access**
 
-Under **Security group(s)**, select your earlier created sg
+Under **Security group(s)**, select your earlier created backend sg
 
 Under **Encryption**, leave default
 
-Under **Tags**, enter `Name:vprofile-rmq01`
+Under **Tags**, enter `Name:myprofile-rmq01`
 
 Review all the settings on the final page, then click **Create**
 
@@ -343,7 +360,7 @@ Select the file located in `REPO_DIRECTORY/target/vprofile-v2.war`
 
 Give a version label if you desire
 
-Change Health threshold to **Severe**, and change back after successful deployment
+Change Health threshold to **Severe** --if needed--, and change back after successful deployment
 Click **Deploy**
 
 ### Connection to DNS
@@ -379,17 +396,3 @@ Click **Create distribution**
 
 
 
-# Edits to Make Later
-At the end of this project, I am going to redo it and rewrite this page according to the improvements. Specifically these following steps:
-
-1. Create RDS, Amazon ElastiCache(memcached), Amazon MQ(rabbitmq)
-2. Create Elastic Beanstalk Environment
-3. Update SG of backend to allow traffic from Bean SG
-4. Launch one of the EBS-created EC2 instances for DB initializing
-5. Carry out the initializing, and then delete the repo when completed
-6. Edit Elastic Beanstalk LoadBalancer Configs
-7.  Build Artifact with Backend Information
-10. Deploy Artifact to Beanstalk
-11. Create CDN with SSL Cert.
-
->Note: I will also skip over Step-5, to check if it is redundant. Because note that the backend services sg already allow all traffic internally, and the EBS-created instances are attached to that sg. So technically, there shouldn't be a need to update their rules to accept traffic on ports from the EBS-created sg

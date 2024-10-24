@@ -11,7 +11,7 @@ database and along with other functionality.
 
 ## Services
 - Tomcat --> Application Server
-- ActiveMQ(RabbitMQ) --> Broker/Queuing Agent
+- AmazonMQ(RabbitMQ) --> Broker/Queuing Agent
 - Elasticache(Memcache) --> DB Caching
 - RDS(MySQL) --> SQL Database
 - ElasticSearch --> Indexing/Search Service
