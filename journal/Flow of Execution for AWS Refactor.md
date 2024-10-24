@@ -1,3 +1,4 @@
+# Flow of Execution for AWS Refactor
 1. Create Key Pair for Beanstalk Instance login
 2. Create Security Group for ElastiCache, RDS & Active MQ
 3. Create RDS, Amazon ElastiCache(memcached), Amazon MQ(rabbitmq)
@@ -35,22 +36,25 @@ At the end of this project, I am going to redo it and rewrite this page accordin
 
 ## 2. Create Security Group for the Backend Services
 Navigate to **EC2>Security Groups>Create security group**
+
+Under **Name**, enter a name such as `myprofile-backend-sg`
+
 Under **Inbound rules**
-- Create a dummy rule such as an ssh rule from my IP, even though it will be impossible to connect to the services publicly since they will be contained in a private network.
+- Create a dummy rule such as an ssh rule from my IP, even though it will be impossible to connect to the services publicly since they will be contained in a private network, then click **Create security group**.
 - Upon successful creation, edit the sg to include a rule to allow `All traffic` from the SG's own `id`. This facilitates communication on all ports between the servers with this sg.
 
 ## 3. Create Amazon RDS, ElastiCache and Active MQ
-### Create the Database with Amazon RDS
+### Create the MySQL Database with Amazon RDS
 Create the Subnet Group
 - Navigate to **RDS>Subnet groups>Create DB subnet group**
-- Under **Name**, enter a name such as `vprofile-rds-sub-group`
+- Under **Name**, enter a name such as `myprofile-rds-sub-group`
 - Select any number of **Availability Zones**(6) and **Subnets**(6) 
 - Click **Create**
 
 Create the Parameter Group
-- Under **Parameter group name**, enter a name such as `vprofile-rds-para-group`
+- Under **Parameter group name**, enter a name such as `myprofile-rds-para-group`
 - Under **Engine type**, select **MySQL Community**
-- Under **Parameter group family**, select **mysql5.6 or mysql5.7**, or choose **MySQL 8\*** to not have to pay for Extended Support
+- Under **Parameter group family**, select **MySQL 8\***
 - Click **Create**
 
 Now Create the Database
