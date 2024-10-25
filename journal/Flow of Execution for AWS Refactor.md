@@ -34,7 +34,7 @@ At the end of this project, I am going to redo it and rewrite this page accordin
 ## 1. Create Key Pair for Beanstalk Instance Login
 * This is self explanatory *
 
-## 2. Create Security Group for the Backend Services
+## 2. Create Backend Security Group for the Backend Services
 Navigate to **EC2>Security Groups>Create security group**
 
 Under **Name**, enter a name such as `myprofile-backend-sg`
@@ -64,7 +64,7 @@ Now Create the Database
 
 - Under **Engine options**
   - Under **Engine type**, select **MySQL**
-  - Under **Engine version**, select **MySQL 5.7\***, or choose **MySQL 8\*** to not have to pay for Extended Support
+  - Under **Engine version**, select **MySQL 8.0.3\*** 
 
 - Under **Templates**, chose **Dev/Test**
 
@@ -75,7 +75,7 @@ Now Create the Database
 - Under **Settings**
   - Set **DB instance identifier** to a name you choose
 
-  - Under **Credentials management**, select **Self managed** and click the checkbox for **Auto generate password**
+  - Under **Credentials management**, select **Self managed** and auto-generate or create your own password.
 
 - Under **DB instance class**, choose a **Burstable classes** equivalent of regular EC2 instances such as `db.t3.micro`
 
@@ -92,19 +92,20 @@ Now Create the Database
 
 - Under **Connectivity**
   - Under **DB subnet group** choose the earlier created subnet group, likely leave the options before this as is.
-  - Under **VPC security group**, choose te earlier created backend sg
+  - Under **VPC security group**, choose the earlier created backend sg
 
 - Under **Database authentication**, leave **Password auth...** as is
 
-- Under **Monitoring**, disable for costs
+- Under **Monitoring**, disable for cost savings
 
 - Under **Additional configuration**
   - Under **Database options**
-    - Under **Initial database name**, enter an appropriate name such as **accounts**
+    - Under **Initial database name**, enter an appropriate name such as `accounts`
     - Under **DB parameter group**, select your earlier created parameter group
   - Under **Backup**
     - You may leave as Enabled
     - You may increase **Backup retention period** to max 35days or leave as 7
+  - Under **Encryption**, you may choose to enable or disable
   - Under **Log exports**, select all four to export to CloudWatch
   - Under **Maintenance**, Check **Enable auto minor version upgrade**
   - Under **Deletion protection**, Check the box
@@ -114,13 +115,13 @@ Now Create the Database
 ### Create Amazon ElastiCache
 Create the Parameter Group
 - Navigate to **Amazon ElastiCache>Configurations>Parameter groups>Create parameter group**
-- Under **Name**, enter a name such as `vprofile-memcached-para-grp`
+- Under **Name**, enter a name such as `myprofile-memcached-para-grp`
 - Under **Family**, select **memcached1.4**
 - Click **Create**
 
 Create Subnet groups
 - Click **Create subnet group**
-- Under **Name**, enter a name such as `vprofile-memcached-sub-grp`
+- Under **Name**, enter a name such as `myprofile-memcached-sub-grp`
 - Leave the default VPC, and the default selected subnets(6)
 - Click **Create**
 
@@ -130,14 +131,14 @@ Now Create the Memcached Service
 - Under **Choose a cluster creation method**
   - Under **Deployment option**, select **Design your own cache** and **Standard create**
 - Under **Location**, choose **AWS Cloud**
-- Under **Cluster info**, enter an appropriate name like `vprofile-elasticache-svc`
+- Under **Cluster info**, enter an appropriate name like `myprofile-elasticache-svc`
 - Under **Cluster settings**
   - Under **Engine version**, select `1.4.5`
   - Under **Parameter groups**, select your earlier created parameter group
   - Under **Node type**, select `cache.t3.micro`
 - Under **Subnet group settings**, choose your earlier created subnet group
 
-- Under **Selected security groups**, click **Manage** and then select your earlier created sg
+- Under **Selected security groups**, click **Manage** and then select your earlier created backend sg
 - Under **Maintenance**
   - Leave **Maintenance window** as **No preference**
   - Leave SNS Topic as Disabled if you want
@@ -229,7 +230,7 @@ Enter the tag: `Project=Myprofile`
 
 Click **Create**
 
->Note: You only need this suceeding subsection if you have never created a role for your ElasticBeanstalk instances
+>Note: You only need this suceeding subsection if you have never created a role for your ElasticBeanstalk instances on this account
 ### Create the Role for Elastic Beanstalk
 Navigate to **IAM>Roles>Create role**
 
@@ -277,7 +278,7 @@ Under **Instance settings**
 - Under **Public IP address** set to  `Activated`
 - Under **Instance subnets**, select all
 
-Under **Database**, ignore all for now *---Note that this is outdated setup*
+Under **Database**, *ignore*
 >Note: For production purposes, you should not mention your RDS database and get it tied up with your Beanstalk instances, your database should have its own rds instance. If you delete Beanstalk, you don't want your database to get deleted.
 
 Under **Root volume**, select **General Purpose (SSD)**
@@ -290,9 +291,9 @@ Under **Auto scaling group**
 - Under **Fleet composition**, leave as default or change according to your need
 - Under **Instance types**, select `t2.micro`
 - Under **Placement**, select all the availability zones
-Under **Scaling triggers**
-- Under **Metric**, select `NetworkOut` as it is very popular for web applications
-- Leave the rest at default
+- Under **Scaling triggers**
+  - Under **Metric**, select `NetworkOut` as it is very popular for web applications
+  - Leave the rest at default
 
 Leave Load Balancer settings as default for now
 
