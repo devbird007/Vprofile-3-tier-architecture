@@ -2,32 +2,15 @@
 1. Create Key Pair for Beanstalk Instance login
 2. Create Security Group for ElastiCache, RDS & Active MQ
 3. Create RDS, Amazon ElastiCache(memcached), Amazon MQ(rabbitmq)
-4. Launch EC2 and Initialize the RDS DB
-5. Create Elastic Beanstalk Environment
-6. Update SG of backend to allow traffic from Bean SG
+4. Create Elastic Beanstalk Environment
+5. *(Optional)* Update SG of backend to allow traffic from Bean SG
+6. Initialize the RDS DB with An EC2 Instance
 7. Edit Elastic Beanstalk LoadBalancer Configs
 8.  Build Artifact with Backend Information
 9.  Deploy Artifact to Beanstalk
 10. Create CloudFront CDN with SSL Certificate
 11. Update Load-balancer endpoint in GoDaddy DNS Zones or Route53 Public DNS Zone
 12. Test everything from the URL
-
----
-
-# Edits to Make Later
-At the end of this project, I am going to redo it and rewrite this page according to the improvements. Specifically these following steps:
-
-1. Create RDS, Amazon ElastiCache(memcached), Amazon MQ(rabbitmq)
-2. Create Elastic Beanstalk Environment
-3. Update SG of backend to allow traffic from Bean SG
-4. Launch one of the EBS-created EC2 instances for DB initializing
-5. Carry out the initializing, and then delete the repo when completed
-6. Edit Elastic Beanstalk LoadBalancer Configs
-7.  Build Artifact with Backend Information
-10. Deploy Artifact to Beanstalk
-11. Create CDN with SSL Cert.
-
->Note: I will also skip over Step-3, to check if it is redundant. Because note that the backend services sg already allow all traffic internally, and the EBS-created instances are attached to that sg. So technically, there shouldn't be a need to update their rules to accept traffic on ports from the EBS-created sg
 
 ---
 
@@ -105,7 +88,7 @@ Now Create the Database
   - Under **Backup**
     - You may leave as Enabled
     - You may increase **Backup retention period** to max 35days or leave as 7
-  - Under **Encryption**, you may choose to enable or disable
+  - Under **Encryption**, you may choose to enable or disable [ I AM ENCRYPTING MY DATABASE NOW. LET ME SEE IF IT CAUSES PROBLEMS DOWN THE LINE FOR ME ]
   - Under **Log exports**, select all four to export to CloudWatch
   - Under **Maintenance**, Check **Enable auto minor version upgrade**
   - Under **Deletion protection**, Check the box
@@ -173,12 +156,16 @@ Under **Tags**, enter `Name:myprofile-rmq01`
 Review all the settings on the final page, then click **Create**
 
 
-## 4. Launch EC2 and Initialize the RDS DB
-### DB Initialization
+## 4. Initialize the RDS Database
+
 Copy your `username`, `password` and `endpoint` that will be generated upon successful creation of your database
 
-Create an EC2 Instance simply to initialize the DB
-- Navigate to **EC2>Instances>Launch an instance>>**
+Now, this can be done in two different ways:
+1. By creating and deleting a new EC2 instance to initialize the Database
+2. Using one of the created instances from Elastic Beanstalk and then deleting it, expecting it to be replaced by the Auto-Scaler
+---
+- #### 1. Creating a new instance
+  - Navigate to **EC2>Instances>Launch an instance>>**
   - Instance Name: `mysql-client`
   - OS: `ubuntu22.04`
   - Create a sg
@@ -192,11 +179,15 @@ Create an EC2 Instance simply to initialize the DB
     sudo apt update
     sudo apt install -y mysql-client
     ```
+  Edit the sg for backend servers to accept traffic of type `MySQL` on port `3306` from the sg of the newly created instance
 
-Edit the sg for backend servers to accept traffic of type `MySQL` on port `3306` from the sg of the newly created instance
-
-`ssh` into your newly created instance
-
+  - #### 2. Using one of the Elastic Beanstalk instances
+    - `ssh` into one of the Elastic Beanstalk instances and install the following:
+      
+      ```
+      sudo yum install -y mysql git
+      ```
+---
 Clone the repository to get the database schema:
 ```
 git clone -b aws-refactor https://github.com/devbird007/Vprofile-3-tier-architecture.git
@@ -204,7 +195,7 @@ git clone -b aws-refactor https://github.com/devbird007/Vprofile-3-tier-architec
 
 Fill the `accounts` database with the schema with the following command:
 ```
-mysql -h vprofile-rds-mysql.c7my2q6maqh6.us-east-1.rds.amazonaws.com -u admin -pIeLchWH51VqpBYQsUVzB accounts < Vprofile-3-tier-architecture/src/main/resources/db_backup.sql
+mysql -h << RDS endpoint >> -u admin -p<<PASSWORD>> accounts < Vprofile-3-tier-architecture/src/main/resources/db_backup.sql
 ```
 
 Run the following command to access the `accounts` database in RDS mysql:
@@ -212,6 +203,7 @@ Run the following command to access the `accounts` database in RDS mysql:
 mysql -h <<Database endpoint from earlier>> -u <<username>> -p<<password>> accounts
 ```
 
+Delete the instance(and its security group if created) when completed.
 
 ## 5. Create Elastic Beanstalk Environment
 ### Note down the required endpoints
@@ -226,7 +218,7 @@ Navigate to **Elastic Beanstalk>Create application**
 
 Enter an appropriate name such as `myprofile-java-app`
 
-Enter the tag: `Project=Myprofile`
+Enter the tag: `Project=myprofile`
 
 Click **Create**
 
@@ -308,6 +300,16 @@ Under **Application deployments**
 
 Review and then click **Submit** on the final page
 
+---
+
+###############################################################
+
+>The following sub-section is thorougly unncessary, because:
+> - When creating the backend-sg, we configured it to accept all traffic from all ports from all servers connected to the sg
+> - We configured the Elastic Beanstalk to use the backend-sg for whatever instances it creates.  
+The combination of these two factors already fulfil the conditions for Elastic Beanstalk instances to connect to the services in the backend because they are all already connected to the backend-sg.  
+You should typically skip this, unless you're making some changes to the security group configurations.
+
 
 ## 6. Update SG of backend to allow traffic from Bean SG
 
@@ -319,6 +321,7 @@ Under **Edit inbound rules**
 *done ->
 >Note: Instead of 3 rules, you could create 1 rule to allow all traffic from the << sg created by Elastic Beanstalk for the EC2 instances >>. However this is less optimal from a security standpoint.
 
+---
 
 ## 7. Edit Elastic Beanstalk LoadBalancer Configs
 Navigate to **Elastic Beanstalk><</ Your created environment />>Configuration>Instance traffic and scaling**
@@ -367,11 +370,13 @@ Give a version label if you desire
 
 Change Health threshold to **Severe** --if needed--, and change back after successful deployment
 Click **Deploy**
+>Note: You may run `mvn clean` once deployed to clear out the target/ directory containing the application artifact vprofile-v2.war
 
+Access the site via the Elastic Beanstalk's endpoint, login and confirm it works.
 ### Connection to DNS
 Go to where your domain name is registered, e.g **godaddy**
 
-Add a DNS record of `type=CNAME`, `Name=myprofile`, `Value=<< Your Elastic Beanstalk Endpoint >>`
+Add a DNS record of `type=CNAME`, `Name=myprofile`, `Value=<< Your Elastic Beanstalk environment endpoint >>`
 
 
 ## 10. Create CloudFront CDN with SSL Certificate

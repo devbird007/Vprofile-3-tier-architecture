@@ -46,7 +46,10 @@ Tomcat:
 Java:
   - 1.8.0 on centos9
 
+Memcached:
+  - 1.4* on Amazon ElastiCache
 
 
 ## Troubleshooting Common Errors
-1. If your apps are deployed successfully, however you are unable to log in on the webpage successfully, you could check out database connection with `telnet IP_Address PORT`
+1. If your apps are deployed successfully, however you are unable to log in successfully, you could check out database connection with `telnet IP_Address PORT`
+2. You should use the appropriate versions if some components aren't working such as the Memcached service
