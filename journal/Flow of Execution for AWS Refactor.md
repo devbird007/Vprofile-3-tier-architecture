@@ -1,7 +1,7 @@
 # Flow of Execution for AWS Refactor
 1. Create Key Pair for Beanstalk Instance login
 2. Create Security Group for ElastiCache, RDS & Active MQ
-3. Create RDS, Amazon ElastiCache(memcached), Amazon MQ(rabbitmq)
+3. Create RDS, Amazon ElastiCache(memcached) & Amazon MQ(rabbitmq)
 4. Create Elastic Beanstalk Environment
 5. *(Optional)* Update SG of backend to allow traffic from Bean SG
 6. Initialize the RDS DB with An EC2 Instance
@@ -26,7 +26,7 @@ Under **Inbound rules**
 - Create a dummy rule such as an ssh rule from my IP, even though it will be impossible to connect to the services publicly since they will be contained in a private network, then click **Create security group**.
 - Upon successful creation, edit the sg to include a rule to allow `All traffic` from the SG's own `id`. This facilitates communication on all ports between the servers with this sg.
 
-## 3. Create Amazon RDS, ElastiCache and Active MQ
+## 3. Create RDS, Amazon ElastiCache(memcached) & Amazon MQ(rabbitmq)
 ### Create the MySQL Database with Amazon RDS
 Create the Subnet Group
 - Navigate to **RDS>Subnet groups>Create DB subnet group**
@@ -95,7 +95,7 @@ Now Create the Database
 
 - Click **Create Database** at the bottom
 
-### Create Amazon ElastiCache
+### Create the Memcached Service with Amazon ElastiCache
 Create the Parameter Group
 - Navigate to **Amazon ElastiCache>Configurations>Parameter groups>Create parameter group**
 - Under **Name**, enter a name such as `myprofile-memcached-para-grp`
@@ -128,7 +128,7 @@ Now Create the Memcached Service
 
 - Review all the settings on the final page, then click **Create**
 
-### Create Amazon MQ
+### Create Rabbitmq Service with Amazon MQ
 Navigate to **Amazon MQ>Brokers>Create brokers**
 
 Under **Broker engine types**, select **RabbitMQ**
@@ -156,56 +156,7 @@ Under **Tags**, enter `Name:myprofile-rmq01`
 Review all the settings on the final page, then click **Create**
 
 
-## 4. Initialize the RDS Database
-
-Copy your `username`, `password` and `endpoint` that will be generated upon successful creation of your database
-
-Now, this can be done in two different ways:
-1. By creating and deleting a new EC2 instance to initialize the Database
-2. Using one of the created instances from Elastic Beanstalk and then deleting it, expecting it to be replaced by the Auto-Scaler
----
-- #### 1. Creating a new instance
-  - Navigate to **EC2>Instances>Launch an instance>>**
-  - Instance Name: `mysql-client`
-  - OS: `ubuntu22.04`
-  - Create a sg
-    - Name: `mysqlClient-sg`
-    - Inbound Rules: ssh login
-  - Add the following to the User data:
-    ```
-    #!/bin/bash
-    set -x
-
-    sudo apt update
-    sudo apt install -y mysql-client
-    ```
-  Edit the sg for backend servers to accept traffic of type `MySQL` on port `3306` from the sg of the newly created instance
-
-  - #### 2. Using one of the Elastic Beanstalk instances
-    - `ssh` into one of the Elastic Beanstalk instances and install the following:
-      
-      ```
-      sudo yum install -y mysql git
-      ```
----
-Clone the repository to get the database schema:
-```
-git clone -b aws-refactor https://github.com/devbird007/Vprofile-3-tier-architecture.git
-```
-
-Fill the `accounts` database with the schema with the following command:
-```
-mysql -h << RDS endpoint >> -u admin -p<<PASSWORD>> accounts < Vprofile-3-tier-architecture/src/main/resources/db_backup.sql
-```
-
-Run the following command to access the `accounts` database in RDS mysql:
-```
-mysql -h <<Database endpoint from earlier>> -u <<username>> -p<<password>> accounts
-```
-
-Delete the instance(and its security group if created) when completed.
-
-## 5. Create Elastic Beanstalk Environment
+## 4. Create Elastic Beanstalk Environment
 ### Note down the required endpoints
 Note down the `db-username`, `db-password`, `db-endpoint`
 
@@ -300,6 +251,7 @@ Under **Application deployments**
 
 Review and then click **Submit** on the final page
 
+
 ---
 
 ###############################################################
@@ -311,7 +263,7 @@ The combination of these two factors already fulfil the conditions for Elastic B
 You should typically skip this, unless you're making some changes to the security group configurations.
 
 
-## 6. Update SG of backend to allow traffic from Bean SG
+## 5. (Optional) Update SG of backend to allow traffic from Bean SG
 
 Navigate to **EC2>Security Groups><</ Your earlier created backend sg />>**
 
@@ -322,6 +274,57 @@ Under **Edit inbound rules**
 >Note: Instead of 3 rules, you could create 1 rule to allow all traffic from the << sg created by Elastic Beanstalk for the EC2 instances >>. However this is less optimal from a security standpoint.
 
 ---
+
+
+## 6. Initialize the RDS DB with An EC2 Instance
+
+Copy your `username`, `password` and `endpoint` that will be generated upon successful creation of your database
+
+Now, this can be done in two different ways:
+1. By creating and deleting a new EC2 instance to initialize the Database
+2. Using one of the created instances from Elastic Beanstalk and then deleting it, expecting it to be replaced by the Auto-Scaler
+---
+- #### 1. Creating a new instance
+  - Navigate to **EC2>Instances>Launch an instance>>**
+  - Instance Name: `mysql-client`
+  - OS: `ubuntu22.04`
+  - Create a sg
+    - Name: `mysqlClient-sg`
+    - Inbound Rules: ssh login
+  - Add the following to the User data:
+    ```
+    #!/bin/bash
+    set -x
+
+    sudo apt update
+    sudo apt install -y mysql-client
+    ```
+  Edit the sg for backend servers to accept traffic of type `MySQL` on port `3306` from the sg of the newly created instance
+
+  - #### 2. Using one of the Elastic Beanstalk instances
+    - `ssh` into one of the Elastic Beanstalk instances and install the following:
+      
+      ```
+      sudo yum install -y mysql git
+      ```
+---
+Clone the repository to get the database schema:
+```
+git clone -b aws-refactor https://github.com/devbird007/Vprofile-3-tier-architecture.git
+```
+
+Fill the `accounts` database with the schema with the following command:
+```
+mysql -h << RDS endpoint >> -u admin -p<<PASSWORD>> accounts < Vprofile-3-tier-architecture/src/main/resources/db_backup.sql
+```
+
+Run the following command to access the `accounts` database in RDS mysql:
+```
+mysql -h <<Database endpoint from earlier>> -u <<username>> -p<<password>> accounts
+```
+
+Delete the instance(and its security group if created) when completed.
+
 
 ## 7. Edit Elastic Beanstalk LoadBalancer Configs
 Navigate to **Elastic Beanstalk><</ Your created environment />>Configuration>Instance traffic and scaling**
