@@ -1,4 +1,4 @@
-# 3-Tier Automated Application Setup on Ubuntu Servers with Shell Scripts for Vagrant
+# 3-Tier Automated Application Setup on Ubuntu and CentOS Servers with Shell Scripts for Vagrant
 This is a distributed web application complete with a web server, 
 database and along with other functionality.
 
