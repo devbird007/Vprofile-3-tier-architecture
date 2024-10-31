@@ -387,7 +387,7 @@ Navigate to **CloudFront>Create a CloudFront distribution**
 
 Under **Origin**
 - Under **Origin domain**, enter the subdomain you created earlier `myprofile.*`
-  >Note: You can also just link the domain name directly
+  >Note: You can also directly select your elastic-beankstalk endpoint. You can also enter your s3 bucket.
 - Under **Protocol**, change to **Match viewer**
 - Under **Minimum Origin SSL protocol**, select `TLSv1`
 
