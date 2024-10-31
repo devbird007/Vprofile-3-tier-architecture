@@ -1,6 +1,13 @@
-# 3-Tier Weh Application Lift and Shift to AWS Cloud Platform
+# Re-architecting a Web Application for a Cloud-Native Environment
+
 This is a distributed web application complete with a web server, 
-database and along with other functionality.
+database and along with other functionality.  
+The traditional **mariadb server** is swapped out for an **AWS-managed RDS mysql service**.  
+The traditional **memcached server** is swapped out for an **AWS-managed Elasticache memcached service**.  
+The traditional **rabbitmq server** is swapped out for an **AWS-managed AmazonMQ rabbitmq service**.  
+The traditional **tomcat servers** are swapped out for an **Amazon ElasticBeanstalk offering** that abstracts instance lifecycle, autoscaling and elastic loadbalancing.
+
+
 
 ## Architecture
 ![architecture](images/cloud-architecture.jpeg)
