@@ -1,4 +1,4 @@
-# 3-Tier Application Setup on Ubuntu Servers or locally with Vagrant
+# 3-Tier Web Application Setup on Ubuntu & CentOS Servers with Vagrant
 This is a distributed web application.
 
 ## Architecture
