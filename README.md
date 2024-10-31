@@ -1,6 +1,10 @@
-# 3-Tier Weh Application Lift and Shift to AWS Cloud Platform
+# Re-architecting a Web Application for a Cloud-Native Environment
+
 This is a distributed web application complete with a web server, 
-database and along with other functionality.
+database and along with other functionality.  
+The traditional mariadb server is swapped out for AWS-managed RDS mysql service.  
+The traditional memcached server is swapped out for 
+
 
 ## Architecture
 ![architecture](images/cloud-architecture.jpeg)
