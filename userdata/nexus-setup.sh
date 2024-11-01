@@ -1,51 +1,82 @@
 #!/bin/bash
+# This is from claude-AI, and it's excellent
 
-## This is a fairly standard installation bash script I got from the web. I should base my own installations off of it ngl
 set -x
 
-## Change this to java 17
-yum install java-1.8.0-openjdk.x86_64 wget -y
+## Variables
+NEXUS_VERSION="3.73.0-12"       ## Update this as needed
+NEXUS_HOME="/opt/nexus"
+NEXUS_DATA="/opt/sonatype-work"
+NEXUS_USER="nexus"
 
+echo "Installing prerequisites..."
+## Install java-17 and other requirements
+yum update -y 
+yum install java-17-openjdk wget -y
+
+echo "Creating Nexus user..."
 ## Create the user with home directory for nexus
-useradd -m -U -d /opt/nexus nexus
+useradd -M -d "$NEXUS_HOME" -s /bin/bash -r "$NEXUS_USER"
 
-## Download nexus tar in the tmp directory
-cd /tmp/
+echo "Downloading and installing Nexus..."
+## Download nexus tar in the /opt directory
+cd /opt/
+wget "https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz" -O nexus.tar.gz
+tar -xvzf nexus.tar.gz 
+rm -f nexus.tar.gz
 
-## For Latest: NEXUSURL="https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
+## Rename directories for easier management
+mv "nexus-${NEXUS_VERSION}" nexus
 
-NEXUSURL="https://download.sonatype.com/nexus/3/nexus-3.73.0-12-unix.tar.gz"
-wget $NEXUSURL -O nexus.tar.gz
+## Set ownership
+chown -R "$NEXUS_USER:$NEXUS_USER" "$NEXUS_HOME"
+chown -R "$NEXUS_USER:$NEXUS_USER" "$NEXUS_DATA"
 
-sleep 10
-tar xvzf nexus.tar.gz -C /opt/nexus/ --strip-components=1
+## Configuring Nexus to run as nexus user
+sed -i 's/#run_as_user=""/run_as_user="nexus"/' "$NEXUS_HOME/bin/nexus.rc"
 
-sleep 5
-rm -f /tmp/nexus.tar.gz
+## Optional Configuring memory settings for best practices reasons
+echo "-XX:MaxDirectMemorySize=2703m" >> $NEXUS_HOME/bin/nexus.vmoptions
 
-sleep 5
-chown -R nexus.nexus /opt/nexus
-
-## Create systemd unit file for Nexus so it can run on startup
-cat <<EOT>> /etc/systemd/system/nexus.service
+## Create systemd service file
+sudo bash -c "cat > /etc/systemd/system/nexus.service" << EOF
 [Unit]
-Description=nexus service
+Description=Nexus Service
 After=network.target
 
 [Service]
 Type=forking
 LimitNOFILE=65536
-ExecStart=/opt/nexus/$NEXUSDIR/bin/nexus start
-ExecStop=/opt/nexus/$NEXUSDIR/bin/nexus stop
-User=nexus
+ExecStart=$NEXUS_HOME/bin/nexus start
+ExecStop=$NEXUS_HOME/bin/nexus stop
+User=$NEXUS_USER
 Restart=on-abort
+TimeoutSec=600
 
 [Install]
 WantedBy=multi-user.target
-EOT
+EOF
 
-echo 'run_as_user="nexus"' > /opt/nexus/$NEXUSDIR/bin/nexus.rc
+## Enable and start Nexus service
 systemctl daemon-reload
-
-systemctl start nexus
 systemctl enable nexus
+systemctl start nexus
+
+
+echo "Waiting for Nexus to start..."
+## Wait for Nexus to start (this might take a few minutes)
+while ! curl -s http://localhost:8081 > /dev/null; do
+    sleep 10
+    echo "Still waiting for Nexus to start..."
+done
+
+echo "Getting initial admin password..."
+ADMIN_PASSWORD=$(sudo cat "$NEXUS_DATA/nexus3/admin.password")
+echo "Initial admin password: $ADMIN_PASSWORD"
+
+echo "Installation complete!"
+echo "Nexus is now running on http://$(hostname -I | cut -d' ' -f1):8081"
+echo "Please wait a few minutes for Nexus to fully initialize"
+echo "Use admin/$ADMIN_PASSWORD to log in"
+echo "Don't forget to change the admin password after first login!"
+
