@@ -38,9 +38,7 @@ cd vagrant/MY_Provisioning
 vagrant up
 ```
 
-Do note that you will then have to manually install and setup each
-server following the instructions in the `local-setup.md` file in the
-same folder.
+Do note that you will then have to manually install and setup each server following the instructions in the `local-setup.md` file in the same folder.
 
 
 ## Technologies 
