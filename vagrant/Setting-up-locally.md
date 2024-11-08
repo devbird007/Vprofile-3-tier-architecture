@@ -1,10 +1,10 @@
-#General Setup
+# General Setup
 For all CentOS-7 servers [db01, mc01, rmq01, app01], run the following:
 
 
 ## Configuring the /etc/yum.repos.d/CentOS-Base.repo file
 >sudo -i
-Run `vi /etc/yum.repos.d/CentOS-Base.repo`
+Run `vi /etc/yum.repos.d/CentOS-Base.repo`v
 
 Comment out the lines starting with **mirrorlist**, while uncommenting the
 lines that start with **baseurl**.
@@ -20,8 +20,7 @@ This will occur four times for [base, updates, extras, centosplus]
 >yum install epel-release -y
 
 
---------------------------------
-#MySQL Setup:
+# MySQL Setup:
 
 vagrant ssh db01
 
@@ -79,8 +78,7 @@ Enter on the last line and close the file:
 >sudo systemctl restart mariadb
 
 
-------------------------------------------------
-#MemCache Setup:
+# MemCache Setup:
 >vagrant ssh mc01
 
 ## Install memcached and dependencies
@@ -103,8 +101,8 @@ Enter on the last line and close the file:
 ## Running memcached
 >memcached -p 11211 -U 11111 -u memcached -d
 
-------------------------------------------------------------
-#RabbitMQ Setup
+
+# RabbitMQ Setup
 >vagrant ssh rmq01
 
 ## Install erlang [Possible Point of Error]
@@ -141,8 +139,7 @@ Enter on the last line and close the file:
 >firewall-cmd --runtime-to-permanent 
 
 
-------------------------------------------------------------
-#App01 Setup
+# App01 Setup
 >vagrant ssh app01
 
 
@@ -218,9 +215,7 @@ In the repository home, run the command:
 >systemctl start tomcat 
 
 
-
------------------------------------------------------
-#Nginx Setup
+# Nginx Setup
 >vagrant ssh web01
 
 ## Update packages repos metadata and install nginx
@@ -260,5 +255,3 @@ Login
 Note: I can change the application by simply finding and deploying another
 	  Java web app on the tomcat server
 	  
-	  
-------------------------------------

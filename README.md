@@ -28,6 +28,8 @@ cd vagrant/MY_Provisioning
 vagrant up
 ```
 
+Then proceed to manually install the applications by following the instructions in the `Setting-up-locally.md` file in the same directory.
+
 # Technologies 
 - Spring MVC
 - Spring Security
