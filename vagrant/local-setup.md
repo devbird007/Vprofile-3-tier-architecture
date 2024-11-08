@@ -251,7 +251,4 @@ server {
 Login
   - username: admin_vp
   - password: admin_vp
-  
-Note: I can change the application by simply finding and deploying another
-	  Java web app on the tomcat server
 	  
