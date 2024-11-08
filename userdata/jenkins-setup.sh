@@ -17,3 +17,5 @@ echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
 sudo apt-get update
 
 sudo apt-get install jenkins -y
+
+## You should install Jenkins on a server with 2gb RAM, for smooth operation.

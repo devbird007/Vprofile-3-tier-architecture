@@ -80,3 +80,5 @@ echo "Please wait a few minutes for Nexus to fully initialize"
 echo "Use admin/$ADMIN_PASSWORD to log in"
 echo "Don't forget to change the admin password after first login!"
 
+
+# Server is recommended to be 8gb RAM, but 4gb RAM is okay as well for smooth operation.
