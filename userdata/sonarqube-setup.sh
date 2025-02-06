@@ -1,17 +1,18 @@
 #!/bin/bash
 
-## This is from claude-ai
+## This is from ClaudeAI
 set -x
 
 ## Variables
-SONAR_VERSION="10.7.0.96327"    ## Update this as needed
+SONAR_VERSION="10.7.0.96327"     ## Update this as needed
 SONAR_HOME="/opt/sonarqube"
 SONAR_USER="sonar"
 
 ## Note: Recommended RAM size for SonarQube is 4GB RAM
-##       This checks the RAM size of the system
+##       This checks the RAM
+
 # echo "Checking system requirements..."
-# MEMORY_KB=$(grep MemTotal /proc/meminfo | aws '{print $2}')
+# MEMORY_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 # MEMORY_GB=$((MEMORY_KB / 1024 / 1024))
 # if [ $MEMORY_GB -lt 4 ]; then
 #     echo "Error: SonarQube requires at least 4GB RAM. Current memory: ${MEMORY_GB}GB"
@@ -88,13 +89,11 @@ sonar.path.data=/opt/sonarqube/data
 sonar.path.temp=/opt/sonarqube/temp
 EOF
 
-## Note: It is recommended to set the min(Xms) and max(Xmx) memory to 
+## Note: It is recommended to set the min(Xms) and max(Xmx) memory to
 ##       the same value.
 
-##       Set "sonar.web.host=127.0.0.1" if you want it only accessible on 
-##       the localhost. This is in such a case where perhaps you want 
-##       sonarqube and nginx on the same server per the Vultr guide,
-##       and you want sonarqube only talking to Nginx. ##
+##       Set "sonar.web.host=127.0.0.1" in scenarios where you want it only
+##       speaking to a web server like Nginx, otherwise leave it at 0.0.0.0
 
 ## Create systemd service
 sudo bash -c "cat > /etc/systemd/system/sonarqube.service" << EOF
@@ -141,59 +140,31 @@ echo "Don't forget to change the admin password after first login!"
 
 ## Install Nginx web server
 ### Install nginx
-sudo apt install nginx
-
-### Install certbot
-sudo snap install core; sudo snap refresh core
-sudo apt remove certbot
-
-sudo snap install --classic certbot
-
-sudo ln -s /snap/bin/certbot /usr/bin/certbot
-
-sudo certbot certonly --nginx --agree-tos --no-eff-email --staple-ocsp --preferred-challenges http -m my_email@gmail.com -d sonarqube.example.com
-
-#### For stronger security
-sudo openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
-
-sudo certbot renew --dry-run
+sudo apt install nginx -y
 
 ### Configure nginx web server file
 sudo rm -rf /etc/nginx/sites-enabled/default
-sudo rm -rf /etc/nginx/sites-available/default
 
-sudo bash -c "cat > /etc/nginx/sites-available/sonarqube" << EOF
-## Redirect HTTP to HTTPS
+sudo bash -c "cat > /etc/nginx/sites-enabled/sonarqube" << EOF
 server {
     listen 80 default_server;
     server_name sonarqube.example.com;
 
-    http2_push_preload on; # Enable HTTP/2 Server Push
-
-    ssl_certificate /etc/letsencrypt/live/sonarqube.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/sonarqube.example.com/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/sonarqube.example.com/chain.pem;
-    ssl_session_timeout 1d;
-    ssl_protocols TLSv1.2 TLSv1.3;
-
-    ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:50m;
-    ssl_stapling on;
-    ssl_stapling_verify on;
-    ssl_dhparam /etc/ssl/certs/dhparam.pem;
-
-    access_log /var/log/nginx/sonarqube.access.log main;
+    access_log /var/log/nginx/sonarqube.access.log;
     error_log /var/log/nginx/sonarqube.error.log;
 
+    proxy_buffers 16 64k;
+    proxy_buffer_size 128k;
+
     location / {
-        proxy_set_header Connection "";
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_http_version 1.1;
         proxy_pass http://127.0.0.1:9000;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_redirect off;
+
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto http;
     }
 }
 EOF
@@ -202,6 +173,4 @@ sudo nginx -t
 
 sudo systemctl restart nginx
 
-reboot
-
-# Server is recommended to be 2gb RAM for smooth operation.
+## Minimum requirement is a t2.medium server

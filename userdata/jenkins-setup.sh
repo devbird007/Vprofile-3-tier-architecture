@@ -18,4 +18,4 @@ sudo apt-get update
 
 sudo apt-get install jenkins -y
 
-## You should install Jenkins on a server with 2gb RAM, for smooth operation.
+## You should install Jenkins on a server with 2gb ram, for smooth operations.

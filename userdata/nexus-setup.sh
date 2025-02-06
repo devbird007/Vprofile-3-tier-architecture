@@ -1,5 +1,5 @@
 #!/bin/bash
-# This is from claude-AI, and it's excellent
+# This is from ClaudeAI, and it is excellent
 
 set -x
 
@@ -11,18 +11,18 @@ NEXUS_USER="nexus"
 
 echo "Installing prerequisites..."
 ## Install java-17 and other requirements
-yum update -y 
-yum install java-17-openjdk wget -y
+yum update -y
+yum install java-17-amazon-corretto wget -y
 
 echo "Creating Nexus user..."
 ## Create the user with home directory for nexus
 useradd -M -d "$NEXUS_HOME" -s /bin/bash -r "$NEXUS_USER"
 
 echo "Downloading and installing Nexus..."
-## Download nexus tar in the /opt directory
+## Download nexus tar into the /opt/ directory
 cd /opt/
 wget "https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz" -O nexus.tar.gz
-tar -xvzf nexus.tar.gz 
+tar -xvzf nexus.tar.gz
 rm -f nexus.tar.gz
 
 ## Rename directories for easier management
@@ -62,7 +62,6 @@ systemctl daemon-reload
 systemctl enable nexus
 systemctl start nexus
 
-
 echo "Waiting for Nexus to start..."
 ## Wait for Nexus to start (this might take a few minutes)
 while ! curl -s http://localhost:8081 > /dev/null; do
@@ -80,5 +79,4 @@ echo "Please wait a few minutes for Nexus to fully initialize"
 echo "Use admin/$ADMIN_PASSWORD to log in"
 echo "Don't forget to change the admin password after first login!"
 
-
-# Server is recommended to be 8gb RAM, but 4gb RAM is okay as well for smooth operation.
+# Nexus server is recommended to be 8gb ram, but 4gb ram is okay as well for smooth operations.
