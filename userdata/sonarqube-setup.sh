@@ -148,7 +148,7 @@ sudo rm -rf /etc/nginx/sites-enabled/default
 sudo bash -c "cat > /etc/nginx/sites-enabled/sonarqube" << EOF
 server {
     listen 80 default_server;
-    server_name sonarqube.example.com;
+    server_name sonarqube.devbird.online;
 
     access_log /var/log/nginx/sonarqube.access.log;
     error_log /var/log/nginx/sonarqube.error.log;
